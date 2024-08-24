@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
-import { SchemaCrudService } from '../services/scheme-crud.service';
+import { SchemaCrudService } from '../services/schema-crud.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { SchemaCrudType } from '../types/schema-crud.type';
 
