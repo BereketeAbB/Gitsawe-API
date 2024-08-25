@@ -1,6 +1,5 @@
 import { Prop,Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Audit } from "src/utils/schemas/audit.schema";
-import { Subscription } from "./subscription.schema";
 import mongoose from "mongoose";
 import { EAccountType } from "src/utils/enums/account.enum";
 
@@ -19,7 +18,6 @@ export class Account extends Audit {
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
     userId: mongoose.Schema.Types.ObjectId;
-
 }
 
 export const AccountSchema = SchemaFactory.createForClass(Account);

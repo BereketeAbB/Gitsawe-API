@@ -8,6 +8,10 @@ import { UserService } from './services/user.service';
 import { AccountController } from './controllers/account.contoller';
 import { AccountService } from './services/account.service';
 import { Account, AccountSchema } from 'src/schemas';
+import { AuthService } from './services/auth.service';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './services/jwt-strategy.service';
+import { AuthController } from './controllers/auth.contoller';
 
 @Module({
   imports: [
@@ -20,15 +24,26 @@ import { Account, AccountSchema } from 'src/schemas';
         name: Account.name,
         schema: AccountSchema,
       },
-    ])
+    ]),
+    JwtModule.registerAsync({
+      useFactory: async () => ({
+        secret: process.env.JWT_SECRET || "yrtugbv3gu3ou8923rwgqiowjrw980322",
+        signOptions: {
+          expiresIn: parseInt(process.env.JWT_EXPIRES_IN) || 3600
+        }
+      })
+    })
   ],
   controllers: [
     UserController,
-    AccountController
+    AccountController,
+    AuthController
     ],
   providers: [
     UserService,
-    AccountService
+    AccountService,
+    AuthService,
+    JwtStrategy
   ],
   exports: [],
 })

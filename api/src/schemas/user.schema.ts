@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Audit } from 'src/utils/schemas/audit.schema';
 import { Subscription } from './subscription.schema';
+import { ERole } from 'src/utils/enums/account.enum';
 
 export type UserDocument = User & Document;
 
@@ -22,6 +23,9 @@ export class User extends Audit {
 
     @Prop({ required: true, unique: true })
     phoneNumber: string;
+
+    @Prop({ required: true, unique: true, enum: ERole, default: ERole.USER })
+    role: ERole;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -39,5 +43,3 @@ UserSchema.virtual('accounts', {
   foreignField: 'userId',
   justOne: false,
 });
-
-// export const UserSchema = UserSchemaItem
