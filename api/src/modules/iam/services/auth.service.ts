@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto, RegisterDto } from '../dtos/register.dto';
 import { AccountService } from './account.service';
 import { Account, AccountDocument, User, UserDocument } from 'src/schemas';
-import { ERole } from 'src/utils/enums/account.enum';
+import { EAccountStatus, ERole } from 'src/utils/enums/account.enum';
 import { UserService } from './user.service';
 import mongoose, { Model, Types } from 'mongoose';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
@@ -26,6 +26,9 @@ export class AuthService {
     if(!account)
         throw new UnauthorizedException()
 
+    if(account.status !== EAccountStatus.ACTIVE)
+        throw new UnauthorizedException("Account is not active")
+
     const isValid = await bcrypt.compareSync(loginDto.password, account.password)
 
     if(!isValid)
@@ -44,7 +47,7 @@ export class AuthService {
     try {
       const [account, existingUser] = await this.accountService.findUserAndAccount(registerDto.username, registerDto.phoneNumber);
       if (account) { 
-        throw new BadRequestException('Email already exists');
+        throw new BadRequestException('Username taken');
       }
 
       // TODO: Phone Number Authentication
@@ -69,6 +72,7 @@ export class AuthService {
 
       const newAccount: Partial<AccountDocument> = { 
         ...registerDto, 
+        otp: this.generateOTP(),
         password: hashedPassword,
       };
 
@@ -77,11 +81,31 @@ export class AuthService {
       await transactionSession.commitTransaction();
       transactionSession.endSession();
 
-      return await this.login({ username: registerDto.username, password: registerDto.password });
+      // return await this.login({ username: registerDto.username, password: registerDto.password });
     } catch (error) {
       await transactionSession.abortTransaction();
       transactionSession.endSession();
       throw error;
     }
+  }
+
+  async activateAccount(username: string, otp: string): Promise<any> {
+    const account = await this.accountService.findAccountWithUser(username)
+
+    if(!account)
+        throw new BadRequestException("Account not found")
+
+    if(account.status !== EAccountStatus.DRAFT)
+        throw new BadRequestException("Account is already active")
+
+    if(account.otp !== otp)
+        throw new BadRequestException("Invalid OTP")
+
+    return await this.accountService.activateAccount(account.id)
+  }
+
+
+  generateOTP(){
+    return "123456"
   }
 }

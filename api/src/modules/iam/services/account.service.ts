@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Account, AccountDocument, User, UserDocument } from 'src/schemas';
+import { EAccountStatus } from 'src/utils/enums/account.enum';
 import { SchemaCrudService } from 'src/utils/services/schema-crud.service';
 
 @Injectable()
@@ -26,5 +27,9 @@ export class AccountService extends SchemaCrudService<AccountDocument>  {
     ])
     
     return [account, user];
+   }
+
+   async activateAccount(accountId: string): Promise<AccountDocument> {
+    return await this.accountModel.findByIdAndUpdate(accountId, { status: EAccountStatus.ACTIVE }, { new: true }).exec()
    }
 }
