@@ -11,9 +11,6 @@ export class SchemaCrudController<T> {
     @Get()
     // @ApiBody({type: () => T})
     async findAll(){
-        console.log({ type: typeof (this.service)})
-        const x = typeof(this.service.constructor)
-        const xs= typeof(this.service)
         return await this.service.findAll()
     }
 

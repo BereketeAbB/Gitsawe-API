@@ -10,7 +10,7 @@ export class UserService extends SchemaCrudService<typeof users> {
         @Inject(DrizzleAsyncProvider)
         protected db: NodePgDatabase<typeof schema>
     ){
-        super(db, schema.users, schema.users.firstName.name)
+        super(db, schema.users)
     }
     
 
