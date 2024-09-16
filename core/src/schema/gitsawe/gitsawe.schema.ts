@@ -9,8 +9,8 @@ type VerseText = {
 type Verse = {
   bookTitle: string;
   chapter: number;
-  start: number;
-  end: number;
+  start: any;
+  end: any;
 };
 
 type VerseType = {

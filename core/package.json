@@ -21,6 +21,7 @@
     "generate": "drizzle-kit generate --config=./src/db/drizzle/drizzle.config.ts",
     "migrate": "drizzle-kit migrate --config=./src/db/drizzle/drizzle.config.ts",
     "introspect": "drizzle-kit introspect:pg",
+    "seed": "tsx ./src/utils/seeder/seed.ts",
     "migration:push": "drizzle-kit push:pg",
     "migration:generate": "drizzle-kit generate:pg",
     "migration:drop": "drizzle-kit drop  --config=./src/db/drizzle.config.ts ",

@@ -26,7 +26,7 @@ export class SchemaCrudService <T> {
     }
 
     async create(itemData: Partial<T>){
-        return await this.db.insert(this.T).values(itemData).execute()
+        return await this.db.insert(this.T).values(itemData).returning()
     }
 
     async update(id: string, itemData: Partial<T>){
