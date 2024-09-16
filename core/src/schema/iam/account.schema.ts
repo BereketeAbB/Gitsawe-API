@@ -1,29 +1,30 @@
-import { Prop,Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Audit } from "src/utils/schemas/audit.schema";
-import mongoose from "mongoose";
-import { EAccountStatus, EAccountType } from "src/utils/enums/account.enum";
+import { pgTable, uuid, text, pgEnum, timestamp, varchar, boolean } from 'drizzle-orm/pg-core';
+import { EAccountStatus, EAccountType } from 'src/utils/enums';
+import { audit, users } from '../';
+import { relations, sql } from 'drizzle-orm';
 
-export type AccountDocument = Account & Document;
+export const accountStatusEnum = pgEnum('account_status', [EAccountStatus.ACTIVE, EAccountStatus.DRAFT, EAccountStatus.INACTIVE]);
+export const accountTypeEnum = pgEnum('account_type', [EAccountType.EMAIL, EAccountType.TELEGRAM_BOT]);
 
-@Schema()
-export class Account extends Audit {
-    @Prop({ required: true, unique: true })
-    username: string;
 
-    @Prop({ required: true, enum: EAccountType })
-    type: EAccountType;
+export const accounts = pgTable("accounts", {
+    ...audit,
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`), 
+  username: varchar("username", { length: 255 }).notNull().unique(),
+  type: accountTypeEnum("type").notNull(),
+  password: text("password").notNull(),
+  userId: uuid("user_id").notNull(), 
+  status: accountStatusEnum("status").default(EAccountStatus.DRAFT).notNull(),
+  otp: text("otp"), 
+  createdAt: timestamp("created_at").notNull().defaultNow(), 
+});
 
-    @Prop({ required: true })
-    password: string;
+export const accountsRelation = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
+  })
+})
+)
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-    userId: mongoose.Schema.Types.ObjectId;
 
-    @Prop({ enum: EAccountStatus, default: EAccountStatus.DRAFT})
-    status: EAccountStatus;
-
-    @Prop({ required: false })
-    otp: string;
-}
-
-export const AccountSchema = SchemaFactory.createForClass(Account);

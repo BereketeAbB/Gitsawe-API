@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { IamModule, GitsaweModule, SubscriptionModule } from './modules';
-import {  } from './modules/gitsawe';
+import { DrizzleModule } from './db';
 
 @Module({
   imports: [
     IamModule,
     GitsaweModule,
-    SubscriptionModule
+    SubscriptionModule,
+    DrizzleModule
   ],
   controllers: [],
   providers: [],

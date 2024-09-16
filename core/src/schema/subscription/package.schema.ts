@@ -1,34 +1,13 @@
-import { Prop,Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Audit } from "src/utils/schemas/audit.schema";
-import { Subscription } from "./subscription.schema";
-import mongoose from "mongoose";
+import { sql } from 'drizzle-orm';
+import { pgTable, uuid, text, varchar, timestamp } from 'drizzle-orm/pg-core';
+import { audit } from '../';
 
-export type PackageDocument = Package & Document;
-
-@Schema()
-export class Package extends Audit {
-
-    @Prop({ required: true, unique: true })
-    name: string;
-
-    @Prop({ required: false })
-    description: string;
-
-    @Prop({ required: true })
-    dateInterval: string;
-
-    @Prop({ required: true })
-    mediaType: string;
-
-    @Prop({ required: false })
-    day: string;
-}
-
-export const PackageSchema = SchemaFactory.createForClass(Package);
-
-PackageSchema.virtual('accounts', {
-    ref: 'Subscription',
-    localField: '_id',
-    foreignField: 'packageId',
-    justOne: false,
-  });
+export const packages = pgTable('packages', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar('name', { length: 255 }).notNull().unique(),
+  description: text('description'),
+  dateInterval: varchar('date_interval', { length: 255 }).notNull(),
+  mediaType: varchar('media_type', { length: 255 }).notNull(),
+  day: varchar('day', { length: 255 }),
+...audit
+});
